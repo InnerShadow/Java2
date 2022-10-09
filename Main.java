@@ -1,31 +1,22 @@
 package rfe.bsu.SikolenkoMa.laba2;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
 
 
 public class Main {
 
     @SuppressWarnings("serial")
     public static class MainFrame extends JFrame{
-        private static final int WIDTH = 400;
-        private static final int HEIGHT = 320;
+        private static final int WIDTH = 700;
+        private static final int HEIGHT = 500;
 
         private JTextField textFieldX;
         private JTextField textFieldY;
@@ -39,6 +30,10 @@ public class Main {
 
         private int formulaId = 1;
 
+        private String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
+        private Box FormulaBox = Box.createHorizontalBox();
+        private JLabel IamgeLable = new JLabel();
+
         public Double calculate1(Double x, Double y, Double z) {
             return Math.sin(Math.log(y) + Math.sin(Math.PI * Math.pow(y, 2))) *
                     Math.pow(Math.pow(x, 2) + Math.sin(z) + Math.exp(Math.cos(z)), 0.25);
@@ -50,12 +45,28 @@ public class Main {
                     Math.pow(x, -0.5) + Math.cos(Math.pow(y, 2))), Math.sin(z));
         }
 
+
         private void addRadioButton(String buttonName, final int formulaId) {
             JRadioButton button = new JRadioButton(buttonName);
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ev) {
+                    //FormulaBox.remove();
+
                     MainFrame.this.formulaId = formulaId;
-                    //imagePane.updateUI();
+                    path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
+
+                    //System.out.println(path);
+
+                    File file = new File(path);
+                    Image img = null;
+                    try {
+                        img = ImageIO.read(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    IamgeLable.setIcon(new ImageIcon(img));
+
                 }
             });
             radioButtons.add(button);
@@ -63,13 +74,14 @@ public class Main {
         }
 
 
-        public MainFrame() {
+        public MainFrame() throws IOException {
             super("Formulas counting");
             setSize(WIDTH, HEIGHT);
             Toolkit kit = Toolkit.getDefaultToolkit();
 // Отцентрировать окно приложения на экране
             setLocation((kit.getScreenSize().width - WIDTH)/2,
                     (kit.getScreenSize().height - HEIGHT)/2);
+
             hboxFormulaType.add(Box.createHorizontalGlue());
             addRadioButton("Formula 1", 1);
             addRadioButton("Formula 2", 2);
@@ -78,6 +90,25 @@ public class Main {
             hboxFormulaType.add(Box.createHorizontalGlue());
             hboxFormulaType.setBorder(
                     BorderFactory.createLineBorder(Color.YELLOW));
+
+//            String cwd = new File("").getAbsolutePath();
+            System.out.println(path);
+
+            File file = new File(path);
+            Image img = null;
+            try {
+                img = ImageIO.read(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            IamgeLable = new JLabel(new ImageIcon(img));
+
+            FormulaBox.add(Box.createHorizontalGlue());
+            FormulaBox.add(IamgeLable);
+            FormulaBox.add(Box.createHorizontalStrut(10));
+            FormulaBox.add(Box.createHorizontalGlue());
+            FormulaBox.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+
 // Создать область с полями ввода для X и Y
             JLabel labelForX = new JLabel("X:");
             textFieldX = new JTextField("0", 10);
@@ -158,10 +189,13 @@ public class Main {
             hboxButtons.add(Box.createHorizontalGlue());
             hboxButtons.setBorder(
                     BorderFactory.createLineBorder(Color.GREEN));
+
+
 // Связать области воедино в компоновке BoxLayout
             Box contentBox = Box.createVerticalBox();
             contentBox.add(Box.createVerticalGlue());
             contentBox.add(hboxFormulaType);
+            contentBox.add(FormulaBox);
             contentBox.add(hboxVariables);
             contentBox.add(hboxResult);
             contentBox.add(hboxButtons);
@@ -171,7 +205,7 @@ public class Main {
 
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         MainFrame frame = new MainFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
