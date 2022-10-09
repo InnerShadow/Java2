@@ -30,6 +30,8 @@ public class Main {
         private JTextField textFieldX;
         private JTextField textFieldY;
 
+        private JTextField textFieldZ;
+
         private JTextField textFieldResult;
 
         private ButtonGroup radioButtons = new ButtonGroup();
@@ -37,12 +39,15 @@ public class Main {
 
         private int formulaId = 1;
 
-        public Double calculate1(Double x, Double y) {
-            return x*x + y*y;
+        public Double calculate1(Double x, Double y, Double z) {
+            return Math.sin(Math.log(y) + Math.sin(Math.PI * Math.pow(y, 2))) *
+                    Math.pow(Math.pow(x, 2) + Math.sin(z) + Math.exp(Math.cos(z)), 0.25);
         }
 
-        public Double calculate2(Double x, Double y) {
-            return x*x*x + 1/y;
+        public Double calculate2(Double x, Double y, Double z) {
+            return Math.pow((Math.cos(Math.exp(x)) + Math.pow(Math.log(1 + Math.pow(y, 2)), 2) +
+                    Math.pow(Math.exp(Math.cos(x)) + Math.pow(Math.sin(Math.PI * z), 2), 0.5) +
+                    Math.pow(x, -0.5) + Math.cos(Math.pow(y, 2))), Math.sin(z));
         }
 
         private void addRadioButton(String buttonName, final int formulaId) {
@@ -80,6 +85,11 @@ public class Main {
             JLabel labelForY = new JLabel("Y:");
             textFieldY = new JTextField("0", 10);
             textFieldY.setMaximumSize(textFieldY.getPreferredSize());
+
+            JLabel labelForZ = new JLabel("Z:");
+            textFieldZ = new JTextField("0", 10);
+            textFieldZ.setMaximumSize(textFieldZ.getPreferredSize());
+
             Box hboxVariables = Box.createHorizontalBox();
             hboxVariables.setBorder(
                     BorderFactory.createLineBorder(Color.RED));
@@ -91,10 +101,15 @@ public class Main {
             hboxVariables.add(labelForY);
             hboxVariables.add(Box.createHorizontalStrut(10));
             hboxVariables.add(textFieldY);
+            hboxVariables.add(Box.createHorizontalStrut(100));
+            hboxVariables.add(labelForZ);
+            hboxVariables.add(Box.createHorizontalStrut(10));
+            hboxVariables.add(textFieldZ);
+
             hboxVariables.add(Box.createHorizontalGlue());
 // Создать область для вывода результата
             JLabel labelForResult = new JLabel("Result:");
-//labelResult = new JLabel("0");
+            //labelResult = new JLabel("0");
             textFieldResult = new JTextField("0", 10);
             textFieldResult.setMaximumSize(
                     textFieldResult.getPreferredSize());
@@ -112,11 +127,12 @@ public class Main {
                     try {
                         Double x = Double.parseDouble(textFieldX.getText());
                         Double y = Double.parseDouble(textFieldY.getText());
+                        Double z = Double.parseDouble(textFieldZ.getText());
                         Double result;
                         if (formulaId==1)
-                            result = calculate1(x, y);
+                            result = calculate1(x, y, z);
                         else
-                            result = calculate2(x, y);
+                            result = calculate2(x, y, z);
                         textFieldResult.setText(result.toString());
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(MainFrame.this,
@@ -130,6 +146,7 @@ public class Main {
                 public void actionPerformed(ActionEvent ev) {
                     textFieldX.setText("0");
                     textFieldY.setText("0");
+                    textFieldZ.setText("0");
                     textFieldResult.setText("0");
                 }
             });
