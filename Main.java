@@ -56,7 +56,6 @@ public class Main {
             JRadioButton button = new JRadioButton(buttonName);
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ev) {
-                    //FormulaBox.remove();
 
                     MainFrame.this.formulaId = formulaId;
                     String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
@@ -96,7 +95,7 @@ public class Main {
             super("Formulas counting");
             setSize(WIDTH, HEIGHT);
             Toolkit kit = Toolkit.getDefaultToolkit();
-// Отцентрировать окно приложения на экране
+
             setLocation((kit.getScreenSize().width - WIDTH)/2,
                     (kit.getScreenSize().height - HEIGHT)/2);
 
@@ -108,8 +107,6 @@ public class Main {
             hboxFormulaType.add(Box.createHorizontalGlue());
             hboxFormulaType.setBorder(
                     BorderFactory.createLineBorder(Color.YELLOW));
-
-//            String cwd = new File("").getAbsolutePath();
 
             String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
             File file = new File(path);
@@ -127,7 +124,6 @@ public class Main {
             FormulaBox.add(Box.createHorizontalGlue());
             FormulaBox.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
-// Создать область с полями ввода для X и Y
             JLabel labelForX = new JLabel("X:");
             textFieldX = new JTextField("0", 10);
             textFieldX.setMaximumSize(textFieldX.getPreferredSize());
@@ -156,9 +152,8 @@ public class Main {
             hboxVariables.add(textFieldZ);
 
             hboxVariables.add(Box.createHorizontalGlue());
-// Создать область для вывода результата
+
             JLabel labelForResult = new JLabel("Result:");
-            //labelResult = new JLabel("0");
             textFieldResult = new JTextField("0", 10);
             textFieldResult.setMaximumSize(
                     textFieldResult.getPreferredSize());
@@ -169,7 +164,7 @@ public class Main {
             hboxResult.add(textFieldResult);
             hboxResult.add(Box.createHorizontalGlue());
             hboxResult.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-// Создать область для кнопок
+
             JButton buttonCalc = new JButton("Count");
             buttonCalc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ev) {
@@ -275,9 +270,6 @@ public class Main {
                     BorderFactory.createLineBorder(Color.BLACK));
 
 
-
-
-// Связать области воедино в компоновке BoxLayout
             Box contentBox = Box.createVerticalBox();
             contentBox.add(Box.createVerticalGlue());
             contentBox.add(hboxFormulaType);
