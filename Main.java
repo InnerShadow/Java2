@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -30,9 +31,15 @@ public class Main {
 
         private int formulaId = 1;
 
-        private String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
         private Box FormulaBox = Box.createHorizontalBox();
         private JLabel IamgeLable = new JLabel();
+
+        private int memoryID = 1;
+        private Vector<Double> mem = new Vector<Double>(3);
+        private ButtonGroup memoryButtons = new ButtonGroup();
+        private Box Memorybox = Box.createHorizontalBox();
+        private Vector<JTextField> TextMemory = new Vector<JTextField>();
+
 
         public Double calculate1(Double x, Double y, Double z) {
             return Math.sin(Math.log(y) + Math.sin(Math.PI * Math.pow(y, 2))) *
@@ -46,14 +53,14 @@ public class Main {
         }
 
 
-        private void addRadioButton(String buttonName, final int formulaId) {
+        private void addFormulaRadioButton(String buttonName, final int formulaId) {
             JRadioButton button = new JRadioButton(buttonName);
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ev) {
                     //FormulaBox.remove();
 
                     MainFrame.this.formulaId = formulaId;
-                    path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
+                    String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
 
                     //System.out.println(path);
 
@@ -73,6 +80,18 @@ public class Main {
             hboxFormulaType.add(button);
         }
 
+        private void addMemoryRadioButton(String buttonname, final int ID){
+            JRadioButton button = new JRadioButton(buttonname);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+
+                    MainFrame.this.memoryID = ID;
+                }
+            });
+            memoryButtons.add(button);
+            Memorybox.add(button);
+        }
+
 
         public MainFrame() throws IOException {
             super("Formulas counting");
@@ -83,8 +102,8 @@ public class Main {
                     (kit.getScreenSize().height - HEIGHT)/2);
 
             hboxFormulaType.add(Box.createHorizontalGlue());
-            addRadioButton("Formula 1", 1);
-            addRadioButton("Formula 2", 2);
+            addFormulaRadioButton("Formula 1", 1);
+            addFormulaRadioButton("Formula 2", 2);
             radioButtons.setSelected(
                     radioButtons.getElements().nextElement().getModel(), true);
             hboxFormulaType.add(Box.createHorizontalGlue());
@@ -92,8 +111,8 @@ public class Main {
                     BorderFactory.createLineBorder(Color.YELLOW));
 
 //            String cwd = new File("").getAbsolutePath();
-            System.out.println(path);
 
+            String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
             File file = new File(path);
             Image img = null;
             try {
@@ -191,6 +210,46 @@ public class Main {
                     BorderFactory.createLineBorder(Color.GREEN));
 
 
+            Memorybox.add(Box.createHorizontalGlue());
+            addMemoryRadioButton("Mem1", 1);
+            addMemoryRadioButton("Mem2", 2);
+            addMemoryRadioButton("Mem3", 3);
+            memoryButtons.setSelected(
+                    memoryButtons.getElements().nextElement().getModel(), true);
+            Memorybox.add(Box.createHorizontalGlue());
+            Memorybox.setBorder(
+                    BorderFactory.createLineBorder(Color.BLACK));
+
+
+            Vector<JLabel> MemoryLables = new Vector<JLabel>();
+            MemoryLables.add(0, new JLabel("Mem1"));
+            MemoryLables.get(0).setMaximumSize(MemoryLables.get(0).getPreferredSize());
+            MemoryLables.add(1, new JLabel("Mem2"));
+            MemoryLables.get(1).setMaximumSize(MemoryLables.get(1).getPreferredSize());
+            MemoryLables.add(2, new JLabel("Mem3"));
+            MemoryLables.get(2).setMaximumSize(MemoryLables.get(2).getPreferredSize());
+
+            TextMemory.add(0, new JTextField("0", 10));
+            TextMemory.get(0).setMaximumSize(TextMemory.get(0).getPreferredSize());
+            TextMemory.add(1, new JTextField("0", 10));
+            TextMemory.get(1).setMaximumSize(TextMemory.get(1).getPreferredSize());
+            TextMemory.add(2, new JTextField("0", 10));
+            TextMemory.get(2).setMaximumSize(TextMemory.get(2).getPreferredSize());
+            Box TextMemoryBox = Box.createHorizontalBox();
+            TextMemoryBox.setBorder(
+                    BorderFactory.createLineBorder(Color.RED));
+            for(int i = 0; i < 3; i++) {
+                TextMemoryBox.add(Box.createHorizontalGlue());
+                TextMemoryBox.add(MemoryLables.get(i));
+                TextMemoryBox.add(Box.createHorizontalStrut(10));
+                TextMemoryBox.add(TextMemory.get(i));
+                TextMemoryBox.add(Box.createHorizontalStrut(100));
+            }
+            hboxVariables.add(Box.createHorizontalGlue());
+
+
+
+
 // Связать области воедино в компоновке BoxLayout
             Box contentBox = Box.createVerticalBox();
             contentBox.add(Box.createVerticalGlue());
@@ -199,6 +258,8 @@ public class Main {
             contentBox.add(hboxVariables);
             contentBox.add(hboxResult);
             contentBox.add(hboxButtons);
+            contentBox.add(Memorybox);
+            contentBox.add(TextMemoryBox);
             contentBox.add(Box.createVerticalGlue());
             getContentPane().add(contentBox, BorderLayout.CENTER);
         }
