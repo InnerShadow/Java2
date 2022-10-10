@@ -34,8 +34,7 @@ public class Main {
         private Box FormulaBox = Box.createHorizontalBox();
         private JLabel IamgeLable = new JLabel();
 
-        private int memoryID = 1;
-        private Vector<Double> mem = new Vector<Double>(3);
+        private int memoryID = 0;
         private ButtonGroup memoryButtons = new ButtonGroup();
         private Box Memorybox = Box.createHorizontalBox();
         private Vector<JTextField> TextMemory = new Vector<JTextField>();
@@ -211,9 +210,11 @@ public class Main {
 
 
             Memorybox.add(Box.createHorizontalGlue());
-            addMemoryRadioButton("Mem1", 1);
-            addMemoryRadioButton("Mem2", 2);
-            addMemoryRadioButton("Mem3", 3);
+            addMemoryRadioButton("Mem1", 0);
+            Memorybox.add(Box.createHorizontalStrut(150));
+            addMemoryRadioButton("Mem2", 1);
+            Memorybox.add(Box.createHorizontalStrut(150));
+            addMemoryRadioButton("Mem3", 2);
             memoryButtons.setSelected(
                     memoryButtons.getElements().nextElement().getModel(), true);
             Memorybox.add(Box.createHorizontalGlue());
@@ -243,9 +244,35 @@ public class Main {
                 TextMemoryBox.add(MemoryLables.get(i));
                 TextMemoryBox.add(Box.createHorizontalStrut(10));
                 TextMemoryBox.add(TextMemory.get(i));
-                TextMemoryBox.add(Box.createHorizontalStrut(100));
+                TextMemoryBox.add(Box.createHorizontalStrut(50));
             }
             hboxVariables.add(Box.createHorizontalGlue());
+
+            JButton MplusButton = new JButton("M+");
+            MplusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    Double num = Double.parseDouble(textFieldResult.getText());
+                    num += Double.parseDouble(TextMemory.get(memoryID).getText());
+                    TextMemory.get(memoryID).setText(String.valueOf(num));
+                }
+            });
+
+            JButton MCButton = new JButton("MC");
+            MCButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    TextMemory.get(memoryID).setText("0");
+                }
+            });
+
+
+            Box MButtonBox = Box.createHorizontalBox();
+            MButtonBox.add(Box.createHorizontalGlue());
+            MButtonBox.add(MplusButton);
+            MButtonBox.add(Box.createHorizontalStrut(30));
+            MButtonBox.add(MCButton);
+            MButtonBox.add(Box.createHorizontalGlue());
+            MButtonBox.setBorder(
+                    BorderFactory.createLineBorder(Color.BLACK));
 
 
 
@@ -260,6 +287,7 @@ public class Main {
             contentBox.add(hboxButtons);
             contentBox.add(Memorybox);
             contentBox.add(TextMemoryBox);
+            contentBox.add(MButtonBox);
             contentBox.add(Box.createVerticalGlue());
             getContentPane().add(contentBox, BorderLayout.CENTER);
         }
