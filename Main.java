@@ -1,367 +1,294 @@
-package rfe.bsu.SikolenkoMa.laba3;
+package rfe.bsu.SikolenkoMa.laba2;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataOutputStream;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import java.io.IOException;
+import java.util.Vector;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
-import javax.swing.JTextField;
-@SuppressWarnings("serial")
-class MainFrame extends JFrame {
-    // Константы с исходным размером окна приложения
-    private static final int WIDTH = 700;
-    private static final int HEIGHT = 500;
-    // Массив коэффициентов многочлена
-    private Double[] coefficients;
-    // Объект диалогового окна для выбора файлов
-// Компонент не создаѐтся изначально, т.к. может и не понадобиться
-// пользователю если тот не собирается сохранять данные в файл
-    private JFileChooser fileChooser = null;
-    // Элементы меню вынесены в поля данных класса, так как ими необходимо
-// манипулировать из разных мест
-    private JMenuItem saveToTextMenuItem;
-    private JMenuItem saveToGraphicsMenuItem;
-    private JMenuItem searchValueMenuItem;
-    // Поля ввода для считывания значений переменных
-    private JTextField textFieldFrom;
-    private JTextField textFieldTo;
-    private JTextField textFieldStep;
-    private Box hBoxResult;
-    // Визуализатор ячеек таблицы
-    private GornerTableCellRenderer renderer = new
-            GornerTableCellRenderer();
-    // Модель данных с результатами вычислений
-    private GornerTableModel data;
 
-    public MainFrame(Double[] coefficients) {
-// Обязательный вызов конструктора предка
-        super("Табулирование многочлена на отрезке по схеме Горнера");
-// Запомнить во внутреннем поле переданные коэффициенты
-        this.coefficients = coefficients;
-// Установить размеры окна
-        setSize(WIDTH, HEIGHT);
-        Toolkit kit = Toolkit.getDefaultToolkit();
-// Отцентрировать окно приложения на экране
-        setLocation((kit.getScreenSize().width - WIDTH) / 2,
-                (kit.getScreenSize().height - HEIGHT) / 2);
-// Создать меню
-        JMenuBar menuBar = new JMenuBar();
-// Установить меню в качестве главного меню приложения
-        setJMenuBar(menuBar);
-// Добавить в меню пункт меню "Файл"
-        JMenu fileMenu = new JMenu("Файл");
-// Добавить его в главное меню
-        menuBar.add(fileMenu);
-// Создать пункт меню "Таблица"
-        JMenu tableMenu = new JMenu("Таблица");
-// Добавить его в главное меню
-        menuBar.add(tableMenu);
-// Создать новое "действие" по сохранению в текстовый файл
-        Action saveToTextAction = new AbstractAction("Сохранить в текстовый файл") {
-            public void actionPerformed(ActionEvent event) {
-                if (fileChooser == null) {
-// Если экземпляр диалогового окна "Открыть файл" ещѐ не создан,
-// то создать его
-                    fileChooser = new JFileChooser();
-// и инициализировать текущей директорией
-                    fileChooser.setCurrentDirectory(new File("."));
+
+public class Main {
+
+    @SuppressWarnings("serial")
+    public static class MainFrame extends JFrame{
+        private static final int WIDTH = 700;
+        private static final int HEIGHT = 500;
+
+        private JTextField textFieldX;
+        private JTextField textFieldY;
+
+        private JTextField textFieldZ;
+
+        private JTextField textFieldResult;
+
+        private ButtonGroup radioButtons = new ButtonGroup();
+        private Box hboxFormulaType = Box.createHorizontalBox();
+
+        private int formulaId = 1;
+
+        private Box FormulaBox = Box.createHorizontalBox();
+        private JLabel IamgeLable = new JLabel();
+
+        private int memoryID = 0;
+        private ButtonGroup memoryButtons = new ButtonGroup();
+        private Box Memorybox = Box.createHorizontalBox();
+        private Vector<JTextField> TextMemory = new Vector<JTextField>();
+
+
+        public Double calculate1(Double x, Double y, Double z) {
+            return Math.sin(Math.log(y) + Math.sin(Math.PI * Math.pow(y, 2))) *
+                    Math.pow(Math.pow(x, 2) + Math.sin(z) + Math.exp(Math.cos(z)), 0.25);
+        }
+
+        public Double calculate2(Double x, Double y, Double z) {
+            return Math.pow((Math.cos(Math.exp(x)) + Math.pow(Math.log(1 + Math.pow(y, 2)), 2) +
+                    Math.pow(Math.exp(Math.cos(x)) + Math.pow(Math.sin(Math.PI * z), 2), 0.5) +
+                    Math.pow(x, -0.5) + Math.cos(Math.pow(y, 2))), Math.sin(z));
+        }
+
+
+        private void addFormulaRadioButton(String buttonName, final int formulaId) {
+            JRadioButton button = new JRadioButton(buttonName);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+
+                    MainFrame.this.formulaId = formulaId;
+                    String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
+
+                    //System.out.println(path);
+
+                    File file = new File(path);
+                    Image img = null;
+                    try {
+                        img = ImageIO.read(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    IamgeLable.setIcon(new ImageIcon(img));
+
                 }
-// Показать диалоговое окно
-                if (fileChooser.showSaveDialog(MainFrame.this) ==
-                        JFileChooser.APPROVE_OPTION)
-// Если результат его показа успешный,
-// сохранить данные в текстовый файл
-                    saveToTextFile(fileChooser.getSelectedFile());
-            }
-        };
-// Добавить соответствующий пункт подменю в меню "Файл"
-        saveToTextMenuItem = fileMenu.add(saveToTextAction);
-// По умолчанию пункт меню является недоступным (данных ещѐ нет)
-        saveToTextMenuItem.setEnabled(false);
-        // Создать новое "действие" по сохранению в текстовый файл
-        Action saveToGraphicsAction = new AbstractAction("Сохранить данные для построения графика") {
-            public void actionPerformed(ActionEvent event) {
-                if (fileChooser == null) {
-// Если экземпляр диалогового окна
-// "Открыть файл" ещѐ не создан,
-// то создать его
-                    fileChooser = new JFileChooser();
-// и инициализировать текущей директорией
-                    fileChooser.setCurrentDirectory(new File("."));
+            });
+            radioButtons.add(button);
+            hboxFormulaType.add(button);
+        }
+
+        private void addMemoryRadioButton(String buttonname, final int ID){
+            JRadioButton button = new JRadioButton(buttonname);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+
+                    MainFrame.this.memoryID = ID;
                 }
-// Показать диалоговое окно
-                if (fileChooser.showSaveDialog(MainFrame.this) ==
-                        JFileChooser.APPROVE_OPTION) ;
-// Если результат его показа успешный,
-// сохранить данные в двоичный файл
-                saveToGraphicsFile(
-                        fileChooser.getSelectedFile());
+            });
+            memoryButtons.add(button);
+            Memorybox.add(button);
+        }
+
+
+        public MainFrame() throws IOException {
+            super("Formulas counting");
+            setSize(WIDTH, HEIGHT);
+            Toolkit kit = Toolkit.getDefaultToolkit();
+
+            setLocation((kit.getScreenSize().width - WIDTH)/2,
+                    (kit.getScreenSize().height - HEIGHT)/2);
+
+            hboxFormulaType.add(Box.createHorizontalGlue());
+            addFormulaRadioButton("Formula 1", 1);
+            addFormulaRadioButton("Formula 2", 2);
+            radioButtons.setSelected(
+                    radioButtons.getElements().nextElement().getModel(), true);
+            hboxFormulaType.add(Box.createHorizontalGlue());
+            hboxFormulaType.setBorder(
+                    BorderFactory.createLineBorder(Color.YELLOW));
+
+            String path = ".\\src\\rfe\\bsu\\SikolenkoMa\\laba2\\Func_" + String.valueOf(formulaId) + ".bmp";
+            File file = new File(path);
+            Image img = null;
+            try {
+                img = ImageIO.read(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        };
-// Добавить соответствующий пункт подменю в меню "Файл"
-        saveToGraphicsMenuItem = fileMenu.add(saveToGraphicsAction);
-// По умолчанию пункт меню является недоступным(данных ещѐ нет)
-        saveToGraphicsMenuItem.setEnabled(false);
-// Создать новое действие по поиску значений многочлена
-        Action searchValueAction = new AbstractAction("Найти значение многочлена") {
-            public void actionPerformed(ActionEvent event) {
-// Запросить пользователя ввести искомую строку
-                String value =
-                        JOptionPane.showInputDialog(MainFrame.this, "Введите значение для поиска",
-                                "Поиск значения", JOptionPane.QUESTION_MESSAGE);
-// Установить введенное значение в качестве иголки
-                renderer.setNeedle(value);
-// Обновить таблицу
-                getContentPane().repaint();
-            }
-        };
-// Добавить действие в меню "Таблица"
-        searchValueMenuItem = tableMenu.add(searchValueAction);
-// По умолчанию пункт меню является недоступным (данных ещѐ нет)
-        searchValueMenuItem.setEnabled(false);
-// Создать область с полями ввода для границ отрезка и шага
-// Создать подпись для ввода левой границы отрезка
-        JLabel labelForFrom = new JLabel("X изменяется на интервале от:");
-// Создать текстовое поле для ввода значения длиной в 10 символов
-// со значением по умолчанию 0.0
-        textFieldFrom = new JTextField("0.0", 10);
-// Установить максимальный размер равный предпочтительному, чтобы
-// предотвратить увеличение размера поля ввода
-        textFieldFrom.setMaximumSize(textFieldFrom.getPreferredSize());
-// Создать подпись для ввода левой границы отрезка
-        JLabel labelForTo = new JLabel("до:");
-// Создать текстовое поле для ввода значения длиной в 10 символов
-// со значением по умолчанию 1.0
-        textFieldTo = new JTextField("1.0", 10);
-// Установить максимальный размер равный предпочтительному, чтобы
-// предотвратить увеличение размера поля ввода
-        textFieldTo.setMaximumSize(textFieldTo.getPreferredSize());
-// Создать подпись для ввода шага табулирования
-        JLabel labelForStep = new JLabel("с шагом:");
-// Создать текстовое поле для ввода значения длиной в 10 символов
-// со значением по умолчанию 1.0
-        textFieldStep = new JTextField("0.1", 10);
-// Установить максимальный размер равный предпочтительному, чтобы
-// предотвратить увеличение размера поля ввода
-        textFieldStep.setMaximumSize(textFieldStep.getPreferredSize());
-// Создать контейнер 1 типа "коробка с горизонтальной укладкой"
-        Box hboxRange = Box.createHorizontalBox();
-// Задать для контейнера тип рамки "объѐмная"
-        hboxRange.setBorder(BorderFactory.createBevelBorder(1));
-// Добавить "клей" C1-H1
-        hboxRange.add(Box.createHorizontalGlue());
-// Добавить подпись "От"
-        hboxRange.add(labelForFrom);
-// Добавить "распорку" C1-H2
-        hboxRange.add(Box.createHorizontalStrut(10));
-// Добавить поле ввода "От"
-        hboxRange.add(textFieldFrom);
-// Добавить "распорку" C1-H3
-        hboxRange.add(Box.createHorizontalStrut(20));
-// Добавить подпись "До"
-        hboxRange.add(labelForTo);
-// Добавить "распорку" C1-H4
-        hboxRange.add(Box.createHorizontalStrut(10));
-// Добавить поле ввода "До"
-        hboxRange.add(textFieldTo);
-// Добавить "распорку" C1-H5
-        hboxRange.add(Box.createHorizontalStrut(20));
-// Добавить подпись "с шагом"
-        hboxRange.add(labelForStep);
-// Добавить "распорку" C1-H6
-        hboxRange.add(Box.createHorizontalStrut(10));
-// Добавить поле для ввода шага табулирования
-        hboxRange.add(textFieldStep);
-// Добавить "клей" C1-H7
-        hboxRange.add(Box.createHorizontalGlue());
-// Установить предпочтительный размер области равным удвоенному
-// минимальному, чтобы при компоновке область совсем не сдавили
-        hboxRange.setPreferredSize(new Dimension(
-                Double.valueOf(hboxRange.getMaximumSize().getWidth()).intValue(),
-                Double.valueOf(hboxRange.getMinimumSize().getHeight()).intValue() * 2));
-// Установить область в верхнюю (северную) часть компоновки
-        getContentPane().add(hboxRange, BorderLayout.NORTH);
-// Создать кнопку "Вычислить"
-        JButton buttonCalc = new JButton("Вычислить");
-// Задать действие на нажатие "Вычислить" и привязать к кнопке
-        buttonCalc.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                try {
-// Считать значения начала и конца отрезка, шага
-                    Double from =
-                            Double.parseDouble(textFieldFrom.getText());
-                    Double to =
-                            Double.parseDouble(textFieldTo.getText());
-                    Double step =
-                            Double.parseDouble(textFieldStep.getText());
-// На основе считанных данных создать новый экземпляр модели таблицы
-                    data = new GornerTableModel(from, to, step,
-                            MainFrame.this.coefficients);
-// Создать новый экземпляр таблицы
-                    JTable table = new JTable(data);
-// Установить в качестве визуализатора ячеек для класса Double разработанный визуализатор
-                    table.setDefaultRenderer(Double.class,
-                            renderer);
-// Установить размер строки таблицы в 30 пикселов
-                    table.setRowHeight(30);
-// Удалить все вложенные элементы из контейнера hBoxResult
-                    hBoxResult.removeAll();
-// Добавить в hBoxResult таблицу, "обѐрнутую" в панель с полосами прокрутки
-                    hBoxResult.add(new JScrollPane(table));
-// Обновить область содержания главного окна
-                    getContentPane().validate();
-// Пометить ряд элементов меню как доступных
-                    saveToTextMenuItem.setEnabled(true);
-                    saveToGraphicsMenuItem.setEnabled(true);
-                    searchValueMenuItem.setEnabled(true);
-                } catch (NumberFormatException ex) {
-// В случае ошибки преобразования чисел показать сообщение об ошибке
-                    JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка в формате записи числа с плавающей точкой", "Ошибочный формат числа",
-                            JOptionPane.WARNING_MESSAGE);
+            IamgeLable = new JLabel(new ImageIcon(img));
+
+            FormulaBox.add(Box.createHorizontalGlue());
+            FormulaBox.add(IamgeLable);
+            FormulaBox.add(Box.createHorizontalStrut(10));
+            FormulaBox.add(Box.createHorizontalGlue());
+            FormulaBox.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+
+            JLabel labelForX = new JLabel("X:");
+            textFieldX = new JTextField("0", 10);
+            textFieldX.setMaximumSize(textFieldX.getPreferredSize());
+            JLabel labelForY = new JLabel("Y:");
+            textFieldY = new JTextField("0", 10);
+            textFieldY.setMaximumSize(textFieldY.getPreferredSize());
+
+            JLabel labelForZ = new JLabel("Z:");
+            textFieldZ = new JTextField("0", 10);
+            textFieldZ.setMaximumSize(textFieldZ.getPreferredSize());
+
+            Box hboxVariables = Box.createHorizontalBox();
+            hboxVariables.setBorder(
+                    BorderFactory.createLineBorder(Color.RED));
+            hboxVariables.add(Box.createHorizontalGlue());
+            hboxVariables.add(labelForX);
+            hboxVariables.add(Box.createHorizontalStrut(10));
+            hboxVariables.add(textFieldX);
+            hboxVariables.add(Box.createHorizontalStrut(100));
+            hboxVariables.add(labelForY);
+            hboxVariables.add(Box.createHorizontalStrut(10));
+            hboxVariables.add(textFieldY);
+            hboxVariables.add(Box.createHorizontalStrut(100));
+            hboxVariables.add(labelForZ);
+            hboxVariables.add(Box.createHorizontalStrut(10));
+            hboxVariables.add(textFieldZ);
+
+            hboxVariables.add(Box.createHorizontalGlue());
+
+            JLabel labelForResult = new JLabel("Result:");
+            textFieldResult = new JTextField("0", 20);
+            textFieldResult.setMaximumSize(
+                    textFieldResult.getPreferredSize());
+            Box hboxResult = Box.createHorizontalBox();
+            hboxResult.add(Box.createHorizontalGlue());
+            hboxResult.add(labelForResult);
+            hboxResult.add(Box.createHorizontalStrut(20));
+            hboxResult.add(textFieldResult);
+            hboxResult.add(Box.createHorizontalGlue());
+            hboxResult.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+
+            JButton buttonCalc = new JButton("Count");
+            buttonCalc.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    try {
+                        Double x = Double.parseDouble(textFieldX.getText());
+                        Double y = Double.parseDouble(textFieldY.getText());
+                        Double z = Double.parseDouble(textFieldZ.getText());
+                        Double result;
+                        if (formulaId==1)
+                            result = calculate1(x, y, z);
+                        else
+                            result = calculate2(x, y, z);
+                        textFieldResult.setText(result.toString());
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Error in floating number!", "Error numbers formula",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
                 }
+            });
+            JButton buttonReset = new JButton("Clear");
+            buttonReset.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    textFieldX.setText("0");
+                    textFieldY.setText("0");
+                    textFieldZ.setText("0");
+                    textFieldResult.setText("0");
+                }
+            });
+            Box hboxButtons = Box.createHorizontalBox();
+            hboxButtons.add(Box.createHorizontalGlue());
+            hboxButtons.add(buttonCalc);
+            hboxButtons.add(Box.createHorizontalStrut(30));
+            hboxButtons.add(buttonReset);
+            hboxButtons.add(Box.createHorizontalGlue());
+            hboxButtons.setBorder(
+                    BorderFactory.createLineBorder(Color.GREEN));
+
+
+            Memorybox.add(Box.createHorizontalGlue());
+            addMemoryRadioButton("Mem1", 0);
+            Memorybox.add(Box.createHorizontalStrut(150));
+            addMemoryRadioButton("Mem2", 1);
+            Memorybox.add(Box.createHorizontalStrut(150));
+            addMemoryRadioButton("Mem3", 2);
+            memoryButtons.setSelected(
+                    memoryButtons.getElements().nextElement().getModel(), true);
+            Memorybox.add(Box.createHorizontalGlue());
+            Memorybox.setBorder(
+                    BorderFactory.createLineBorder(Color.BLACK));
+
+
+            Vector<JLabel> MemoryLables = new Vector<JLabel>();
+            MemoryLables.add(0, new JLabel("Mem1"));
+            MemoryLables.get(0).setMaximumSize(MemoryLables.get(0).getPreferredSize());
+            MemoryLables.add(1, new JLabel("Mem2"));
+            MemoryLables.get(1).setMaximumSize(MemoryLables.get(1).getPreferredSize());
+            MemoryLables.add(2, new JLabel("Mem3"));
+            MemoryLables.get(2).setMaximumSize(MemoryLables.get(2).getPreferredSize());
+
+            TextMemory.add(0, new JTextField("0", 20));
+            TextMemory.get(0).setMaximumSize(TextMemory.get(0).getPreferredSize());
+            TextMemory.add(1, new JTextField("0", 20));
+            TextMemory.get(1).setMaximumSize(TextMemory.get(1).getPreferredSize());
+            TextMemory.add(2, new JTextField("0", 20));
+            TextMemory.get(2).setMaximumSize(TextMemory.get(2).getPreferredSize());
+            Box TextMemoryBox = Box.createHorizontalBox();
+            TextMemoryBox.setBorder(
+                    BorderFactory.createLineBorder(Color.RED));
+
+            for(int i = 0; i < 3; i++) {
+                TextMemoryBox.add(Box.createHorizontalGlue());
+                TextMemoryBox.add(MemoryLables.get(i));
+                TextMemoryBox.add(Box.createHorizontalStrut(10));
+                TextMemoryBox.add(TextMemory.get(i));
+                TextMemoryBox.add(Box.createHorizontalStrut(50));
             }
-        });
-// Создать кнопку "Очистить поля"
-        JButton buttonReset = new JButton("Очистить поля");
-// Задать действие на нажатие "Очистить поля" и привязать к кнопке
-        buttonReset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-// Установить в полях ввода значения по умолчанию
-                textFieldFrom.setText("0.0");
-                textFieldTo.setText("1.0");
-                textFieldStep.setText("0.1");
-// Удалить все вложенные элементы контейнера hBoxResult
-                hBoxResult.removeAll();
-// Добавить в контейнер пустую панель
-                hBoxResult.add(new JPanel());
-// Пометить элементы меню как недоступные
-                saveToTextMenuItem.setEnabled(false);
-                saveToGraphicsMenuItem.setEnabled(false);
-                searchValueMenuItem.setEnabled(false);
-// Обновить область содержания главного окна
-                getContentPane().validate();
-            }
-        });
-// Поместить созданные кнопки в контейнер
-        Box hboxButtons = Box.createHorizontalBox();
-        hboxButtons.setBorder(BorderFactory.createBevelBorder(1));
-        hboxButtons.add(Box.createHorizontalGlue());
-        hboxButtons.add(buttonCalc);
-        hboxButtons.add(Box.createHorizontalStrut(30));
-        hboxButtons.add(buttonReset);
-        hboxButtons.add(Box.createHorizontalGlue());
-// Установить предпочтительный размер области равным удвоенному минимальному, чтобы при
-// компоновке окна область совсем не сдавили
-        hboxButtons.setPreferredSize(new Dimension(Double.valueOf(hboxButtons.getMaximumSize().getWidth()).intValue(),
-                Double.valueOf(hboxButtons.getMinimumSize().getHeight()).intValue() * 2));
-// Разместить контейнер с кнопками в нижней (южной) области граничной компоновки
-        getContentPane().add(hboxButtons, BorderLayout.SOUTH);
-// Область для вывода результата пока что пустая
-        hBoxResult = Box.createHorizontalBox();
-        hBoxResult.add(new JPanel());
-// Установить контейнер hBoxResult в главной (центральной) области граничной компоновки
-        getContentPane().add(hBoxResult, BorderLayout.CENTER);
+            hboxVariables.add(Box.createHorizontalGlue());
+
+            JButton MplusButton = new JButton("M+");
+            MplusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    Double num = Double.parseDouble(textFieldResult.getText());
+                    num += Double.parseDouble(TextMemory.get(memoryID).getText());
+                    TextMemory.get(memoryID).setText(String.valueOf(num));
+                }
+            });
+
+            JButton MCButton = new JButton("MC");
+            MCButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ev) {
+                    TextMemory.get(memoryID).setText("0");
+                }
+            });
+
+
+            Box MButtonBox = Box.createHorizontalBox();
+            MButtonBox.add(Box.createHorizontalGlue());
+            MButtonBox.add(MplusButton);
+            MButtonBox.add(Box.createHorizontalStrut(30));
+            MButtonBox.add(MCButton);
+            MButtonBox.add(Box.createHorizontalGlue());
+            MButtonBox.setBorder(
+                    BorderFactory.createLineBorder(Color.BLACK));
+
+
+            Box contentBox = Box.createVerticalBox();
+            contentBox.add(Box.createVerticalGlue());
+            contentBox.add(hboxFormulaType);
+            contentBox.add(FormulaBox);
+            contentBox.add(hboxVariables);
+            contentBox.add(hboxResult);
+            contentBox.add(hboxButtons);
+            contentBox.add(Memorybox);
+            contentBox.add(TextMemoryBox);
+            contentBox.add(MButtonBox);
+            contentBox.add(Box.createVerticalGlue());
+            getContentPane().add(contentBox, BorderLayout.CENTER);
+        }
+
     }
 
-    protected void saveToGraphicsFile(File selectedFile) {
-        try {
-// Создать новый байтовый поток вывода, направленный в указанный файл
-            DataOutputStream out = new DataOutputStream(new
-                    FileOutputStream(selectedFile));
-// Записать в поток вывода попарно значение X в точке, значение многочлена в точке
-            for (int i = 0; i < data.getRowCount(); i++) {
-                out.writeDouble((Double) data.getValueAt(i, 0));
-                out.writeDouble((Double) data.getValueAt(i, 1));
-            }
-// Закрыть поток вывода
-            out.close();
-        } catch (Exception e) {
-// Исключительную ситуацию "ФайлНеНайден" в данном случае можно не обрабатывать,
-// так как мы файл создаѐм, а не открываем для чтения
-        }
-    }
-
-    protected void saveToTextFile(File selectedFile) {
-        try {
-// Создать новый символьный поток вывода, направленный в указанный файл
-            PrintStream out = new PrintStream(selectedFile);
-// Записать в поток вывода заголовочные сведения
-
-            out.println("Результаты табулирования многочлена по схеме Горнера");
-            out.print("Многочлен: ");
-            for (int i = 0; i < coefficients.length; i++) {
-                out.print(coefficients[i] + "*X^" +
-                        (coefficients.length - i - 1));
-                if (i != coefficients.length - 1)
-                    out.print(" + ");
-            }
-            out.println("");
-            out.println("Интервал от " + data.getFrom() + " до " +
-                    data.getTo() + " с шагом " + data.getStep());
-            out.println("====================================================");
-// Записать в поток вывода значения в точках
-            for (int i = 0; i < data.getRowCount(); i++) {
-                out.println("Значение в точке " + data.getValueAt(i, 0)
-                        + " равно " + data.getValueAt(i, 1));
-            }
-// Закрыть поток
-            out.close();
-        } catch (FileNotFoundException e) {
-// Исключительную ситуацию "ФайлНеНайден" можно не
-// обрабатывать, так как мы файл создаѐм, а не открываем
-        }
-    }
-
-    public static void main(String[] args) {
-// Если не задано ни одного аргумента командной строки -
-// Продолжать вычисления невозможно, коэффиценты неизвестны
-        if (args.length == 0) {
-            System.out.println("Невозможно табулировать многочлен, для которого не задано ни одного коэффициента!");
-            System.exit(-1);
-        }
-// Зарезервировать места в массиве коэффициентов столько, сколько аргументов командной строки
-        Double[] coefficients = new Double[args.length];
-        int i = 0;
-        try {
-// Перебрать аргументы, пытаясь преобразовать их в Double
-            for (String arg : args) {
-                coefficients[i++] = Double.parseDouble(arg);
-            }
-        } catch (NumberFormatException ex) {
-// Если преобразование невозможно - сообщить об ошибке и завершиться
-            System.out.println("Ошибка преобразования строки '" +
-                    args[i] + "' в число типа Double");
-            System.exit(-2);
-        }
-        for(Double coef :coefficients){
-            System.out.println(coef);
-        }
-// Создать экземпляр главного окна, передав ему коэффициенты
-        MainFrame frame = new MainFrame(coefficients);
-// Задать действие, выполняемое при закрытии окна
+    public static void main(String[] args) throws IOException {
+        MainFrame frame = new MainFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
